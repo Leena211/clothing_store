@@ -1,0 +1,52 @@
+.productCard {
+  background-color: #f9f9f9; /* Light pastel background */
+  border-radius: 15px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  overflow: hidden; /* Ensures rounded corners are applied to child elements */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.productCard:hover {
+  transform: translateY(-5px); /* Lift effect on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+.productImage {
+  width: 100%;
+  height: auto;
+  border-radius: 10px; /* Rounded corners for images */
+}
+
+.productTitle {
+  font-family: 'Montserrat', sans-serif; /* Stylish modern font */
+  font-size: 1.5rem; /* Adjust font size */
+  color: #333; /* Dark text for contrast */
+  margin: 10px 0;
+}
+
+.productPrice {
+  font-family: 'Montserrat', sans-serif; /* Stylish modern font */
+  font-size: 1.25rem; /* Adjust font size */
+  color: #666; /* Softer color for price */
+  margin: 5px 0;
+}
+
+.addToCartButton {
+  background-color: #ff6f61; /* Pastel color for button */
+  color: white; /* White text for contrast */
+  border: none; /* Remove default border */
+  border-radius: 25px; /* Fully rounded button */
+  padding: 10px 20px; /* Padding for button */
+  font-family: 'Montserrat', sans-serif; /* Stylish modern font */
+  font-size: 1rem; /* Adjust font size */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth background color transition */
+}
+
+.addToCartButton:hover {
+  background-color: #ff4f3d; /* Darker shade on hover */
+}

@@ -1,0 +1,33 @@
+.categoryCard {
+  background-color: #f8f0e3; /* Soft beige background */
+  border-radius: 15px; /* Rounded corners */
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.categoryCard:hover {
+  transform: translateY(-5px); /* Lift effect on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+}
+
+.categoryImage {
+  border-radius: 10px; /* Rounded image corners */
+  width: 100%;
+  height: auto;
+}
+
+.categoryTitle {
+  font-family: 'Montserrat', sans-serif; /* Stylish modern font */
+  font-size: 1.5rem; /* Adjust font size */
+  color: #333; /* Darker text for contrast */
+  margin-top: 10px;
+}
+
+.categoryDescription {
+  font-family: 'Lora', serif; /* Stylish modern font */
+  font-size: 1rem; /* Adjust font size */
+  color: #666; /* Softer text color */
+  margin-top: 5px;
+}

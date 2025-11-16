@@ -1,0 +1,26 @@
+{
+  "name": "clothing_store",
+  "version": "1.0.0",
+  "description": "online clothing store website application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tejashree3-git/clothing_store.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Tejashree3-git/clothing_store/issues"
+  },
+  "homepage": "https://github.com/Tejashree3-git/clothing_store#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17"
+  }
+}
