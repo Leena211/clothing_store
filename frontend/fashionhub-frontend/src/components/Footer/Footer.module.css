@@ -1,0 +1,43 @@
+.footer {
+    background-color: #f8f1f1; /* Soft pink background */
+    color: #4a4a4a; /* Darker text for contrast */
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #e0dada; /* Light border for separation */
+    font-family: 'Poppins', sans-serif; /* Stylish modern font */
+}
+
+.footer h2 {
+    font-size: 24px;
+    margin: 10px 0;
+    font-weight: 600;
+}
+
+.footer p {
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.footer a {
+    color: #4a4a4a; /* Darker link color */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #a0522d; /* Change color on hover */
+}
+
+.footer .social-icons {
+    margin-top: 10px;
+}
+
+.footer .social-icons a {
+    margin: 0 10px;
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.footer .social-icons a:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}

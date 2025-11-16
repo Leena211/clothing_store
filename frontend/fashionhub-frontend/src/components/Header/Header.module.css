@@ -1,0 +1,45 @@
+.header {
+    background-color: #f8f0e3; /* Soft beige */
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e0d4c1; /* Light border for separation */
+}
+
+.logo {
+    font-family: 'Elegant Font', sans-serif; /* Replace with your chosen stylish font */
+    font-size: 2rem;
+    color: #d19dcf; /* Soft pink */
+}
+
+.nav {
+    display: flex;
+    gap: 20px;
+}
+
+.navLink {
+    font-family: 'Stylish Modern Font', sans-serif; /* Replace with your chosen stylish font */
+    color: #4a4a4a; /* Darker shade for contrast */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.navLink:hover {
+    color: #d19dcf; /* Change to soft pink on hover */
+}
+
+.button {
+    background-color: #d1e8e2; /* Mint color */
+    color: #4a4a4a; /* Darker shade for contrast */
+    border: none;
+    border-radius: 25px; /* Rounded button */
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.button:hover {
+    background-color: #b2e0db; /* Lighter mint on hover */
+    transform: scale(1.05); /* Slightly enlarge on hover */
+}
