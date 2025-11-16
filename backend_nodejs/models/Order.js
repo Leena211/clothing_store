@@ -148,6 +148,21 @@ const orderSchema = mongoose.Schema(
     cancellationReason: {
       type: String,
     },
+    deliveryStatus: {
+      type: String,
+      enum: ['Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered'],
+      default: 'Pending',
+    },
+    deliveryUpdates: [{
+      status: {
+        type: String,
+        required: true,
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+      },
+    }],
   },
   {
     timestamps: true,
@@ -166,6 +181,15 @@ orderSchema.pre('save', function(next) {
     const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
     this.orderNumber = `ORD-${timestamp}-${random}`;
   }
+  
+  // Initialize deliveryUpdates if new order
+  if (this.isNew && this.deliveryUpdates.length === 0) {
+    this.deliveryUpdates.push({
+      status: this.deliveryStatus || 'Pending',
+      updatedAt: new Date(),
+    });
+  }
+  
   next();
 });
 

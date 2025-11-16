@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
+const { logger } = require('../config/logger');
 
 // @desc    Register a user
 // @route   POST /api/auth/register
@@ -62,7 +63,7 @@ const register = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error);
+    logger.error('Registration error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error during registration',
@@ -119,7 +120,7 @@ const login = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.error(error);
+    logger.error('Login error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error during login',
@@ -158,7 +159,7 @@ const getMe = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    logger.error('Get user error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error retrieving user data',
@@ -209,7 +210,7 @@ const updateProfile = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    logger.error('Update profile error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error updating profile',
@@ -258,7 +259,7 @@ const changePassword = async (req, res) => {
       message: 'Password changed successfully',
     });
   } catch (error) {
-    console.error(error);
+    logger.error('Change password error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error changing password',

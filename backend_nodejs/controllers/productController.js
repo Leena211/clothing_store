@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const { logger } = require('../config/logger');
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -101,7 +102,7 @@ const getProducts = async (req, res) => {
       pagination,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error retrieving products',
@@ -128,7 +129,7 @@ const getProduct = async (req, res) => {
       product,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error retrieving product',
@@ -161,7 +162,7 @@ const createProduct = async (req, res) => {
       product,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error creating product',
@@ -204,7 +205,7 @@ const updateProduct = async (req, res) => {
       product,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error updating product',
@@ -233,7 +234,7 @@ const deleteProduct = async (req, res) => {
       message: 'Product deleted successfully',
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error deleting product',
@@ -255,7 +256,7 @@ const getFeaturedProducts = async (req, res) => {
       products,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error retrieving featured products',
@@ -297,7 +298,7 @@ const getProductsByCategory = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error retrieving products by category',
@@ -323,7 +324,7 @@ const getCategories = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error retrieving categories',

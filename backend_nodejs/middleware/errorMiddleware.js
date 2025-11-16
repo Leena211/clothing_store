@@ -1,8 +1,17 @@
+const { logger } = require('../config/logger');
+
 const errorHandler = (err, req, res, next) => {
   let error = { ...err };
   error.message = err.message;
 
   // Log error
+  logger.error({
+    message: err.message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+    ip: req.ip,
+  });
   console.error(err);
 
   // Mongoose bad ObjectId
@@ -21,6 +30,11 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === 'ValidationError') {
     const message = Object.values(err.errors).map(val => val.message).join(', ');
     error = { message, statusCode: 400 };
+  }
+
+  // Express-validator errors
+  if (err.type === 'express-validator') {
+    error = { message: err.message, statusCode: 400 };
   }
 
   // JWT errors

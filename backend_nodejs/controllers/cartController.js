@@ -1,5 +1,6 @@
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
+const { logger } = require('../config/logger');
 
 // @desc    Get user cart
 // @route   GET /api/cart
@@ -20,7 +21,7 @@ const getCart = async (req, res) => {
       cart: cart.getCartSummary(),
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error retrieving cart',
@@ -116,7 +117,7 @@ const addToCart = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error adding item to cart',
@@ -165,7 +166,7 @@ const updateCartItem = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error updating cart item',
@@ -206,7 +207,7 @@ const removeFromCart = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error removing item from cart',
@@ -236,7 +237,7 @@ const clearCart = async (req, res) => {
       cart: cart.getCartSummary(),
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error clearing cart',
@@ -258,7 +259,7 @@ const getCartCount = async (req, res) => {
       count,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error getting cart count',

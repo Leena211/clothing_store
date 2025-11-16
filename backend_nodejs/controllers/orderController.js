@@ -1,6 +1,7 @@
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
+const { logger } = require('../config/logger');
 
 // @desc    Create a new order
 // @route   POST /api/orders
@@ -122,7 +123,7 @@ const createOrder = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error creating order',
@@ -152,7 +153,7 @@ const getUserOrders = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error retrieving orders',
@@ -190,7 +191,7 @@ const getOrder = async (req, res) => {
       order,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error retrieving order',
@@ -234,7 +235,7 @@ const updateOrderStatus = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error updating order status',
@@ -290,7 +291,7 @@ const cancelOrder = async (req, res) => {
       order: order.getOrderSummary(),
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error cancelling order',
@@ -369,7 +370,7 @@ const trackOrder = async (req, res) => {
       timeline,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error tracking order',
@@ -408,10 +409,110 @@ const getAllOrders = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error retrieving all orders',
+    });
+  }
+};
+
+// @desc    Get order tracking info
+// @route   GET /api/orders/:id/tracking
+// @access  Private
+const getOrderTracking = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).select('user deliveryStatus deliveryUpdates orderNumber');
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
+
+    // Check if order belongs to user or user is admin
+    if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied',
+      });
+    }
+
+    res.json({
+      success: true,
+      order: {
+        orderNumber: order.orderNumber,
+        deliveryStatus: order.deliveryStatus,
+        deliveryUpdates: order.deliveryUpdates,
+      },
+    });
+  } catch (error) {
+    logger.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error retrieving order tracking',
+    });
+  }
+};
+
+// @desc    Update order delivery tracking
+// @route   PATCH /api/orders/:id/tracking
+// @access  Private (Admin only)
+const updateOrderTracking = async (req, res) => {
+  try {
+    const { deliveryStatus } = req.body;
+
+    // Validation
+    if (!deliveryStatus) {
+      return res.status(400).json({
+        success: false,
+        message: 'deliveryStatus is required',
+      });
+    }
+
+    const allowedStatuses = ['Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered'];
+    if (!allowedStatuses.includes(deliveryStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid deliveryStatus. Must be one of: ${allowedStatuses.join(', ')}`,
+      });
+    }
+
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
+
+    // Update delivery status
+    order.deliveryStatus = deliveryStatus;
+
+    // Push update to deliveryUpdates array
+    order.deliveryUpdates.push({
+      status: deliveryStatus,
+      updatedAt: new Date(),
+    });
+
+    await order.save();
+
+    res.json({
+      success: true,
+      message: 'Delivery status updated successfully',
+      order: {
+        orderNumber: order.orderNumber,
+        deliveryStatus: order.deliveryStatus,
+        deliveryUpdates: order.deliveryUpdates,
+      },
+    });
+  } catch (error) {
+    logger.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error updating order tracking',
     });
   }
 };
@@ -424,4 +525,6 @@ module.exports = {
   cancelOrder,
   trackOrder,
   getAllOrders,
+  getOrderTracking,
+  updateOrderTracking,
 };
