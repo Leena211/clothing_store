@@ -16,78 +16,183 @@ const connectDB = require('../config/db');
 
 // Map JSON format to Mongoose schema
 function mapProductToSchema(productJson) {
-  // Map gender: 'men' -> 'Men', 'women' -> 'Women', 'kids' -> 'Kids'
-  const genderMap = {
-    'men': 'Men',
-    'women': 'Women',
-    'kids': 'Kids'
-  };
+  try {
+    // Default values for required fields
+    const defaultValues = {
+      price: Math.floor(Math.random() * 500) + 99, // Random price between 100-599
+      stock: Math.floor(Math.random() * 50) + 10,  // Random stock between 10-60
+      sizes: ['S', 'M', 'L', 'XL'], // Default sizes with XL added
+      gender: 'Unisex', // Default gender
+      brand: 'Generic' // Default brand
+    };
 
-  // Map sizes array to Mongoose format [{size: 'M', stock: 10}, ...]
-  // Distribute stock across sizes
-  const totalStock = productJson.stock;
-  const sizesCount = productJson.sizes.length;
-  const stockPerSize = Math.floor(totalStock / sizesCount);
-  const remainder = totalStock % sizesCount;
+    // Truncate and clean name
+    const name = (productJson['display name'] || 'Unnamed Product').substring(0, 50).trim();
+    
+    // Truncate and clean description
+    const description = (productJson.description || 'No description available')
+      .substring(0, 1000)
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .trim();
+    
+    // Ensure price is a number and has a reasonable value
+    const price = Math.max(10, Math.min(9999, Number(productJson.price) || defaultValues.price));
+    
+    // Category mapping with more comprehensive list
+    const categoryMap = {
+      'Shirt': 'Shirts',
+      'T-Shirt': 'T-Shirts',
+      'Tshirt': 'T-Shirts',
+      'Top': 'T-Shirts',
+      'Jeans': 'Jeans',
+      'Pant': 'Pants',
+      'Trouser': 'Pants',
+      'Dress': 'Dresses',
+      'Kurta': 'Dresses',
+      'Skirt': 'Dresses',
+      'Jacket': 'Jackets',
+      'Sweater': 'Sweaters',
+      'Hoodie': 'Sweaters',
+      'Shoe': 'Shoes',
+      'Sport': 'Shoes',
+      'Heel': 'Shoes',
+      'Accessory': 'Accessories',
+      'Sunglass': 'Accessories',
+      'Watch': 'Accessories',
+      'Belt': 'Accessories',
+      'Sock': 'Accessories',
+      'Bag': 'Bags',
+      'Underwear': 'Underwear',
+      'Bra': 'Underwear'
+    };
 
-  const sizes = productJson.sizes.map((size, index) => ({
+    // Clean and map the category
+    const cleanCategory = (productJson.category || 'Clothing').trim();
+    const mappedCategory = Object.entries(categoryMap).find(([key]) => 
+      cleanCategory.toLowerCase().includes(key.toLowerCase())
+    )?.[1] || 'Clothing';
+
+    // Get brand from product name or use default
+    const brand = (productJson.brand || name.split(' ')[0] || defaultValues.brand)
+      .substring(0, 30)
+      .trim();
+      
+    const gender = defaultValues.gender; // Default to Unisex
+  
+  // Process sizes with random stock distribution
+  const sizes = defaultValues.sizes.map(size => ({
     size: size,
-    stock: stockPerSize + (index < remainder ? 1 : 0)
+    stock: Math.floor((defaultValues.stock / defaultValues.sizes.length) * (0.8 + Math.random() * 0.4)) // Random stock within 80-120% of average
   }));
 
-  // Map image_urls to Mongoose format [{url: '...', alt: '...'}, ...]
-  const images = productJson.image_urls.map((url, index) => ({
-    public_id: `product_${productJson.id}_${index + 1}`,
-    url: url,
-    alt: `${productJson.name} - Image ${index + 1}`
-  }));
-
-  // Map category to match Mongoose enum if needed
-  let category = productJson.category;
-  const categoryMap = {
-    'T-shirts': 'T-Shirts',
-    'Tops': 'T-Shirts',
-    'Shirts': 'Shirts',
-    'Denim': 'Jeans',
-    'Jeans': 'Jeans',
-    'Hoodies': 'Sweaters',
-    'Jackets': 'Jackets',
-    'Formal Wear': 'Shirts',
-    'Shoes': 'Shoes',
-    'Heels': 'Shoes',
-    'Footwear': 'Shoes',
-    'Accessories': 'Accessories',
-    'Handbags': 'Bags',
-    'Dresses': 'Dresses',
-    'Kurti': 'Dresses',
-    'Saree': 'Dresses',
-    'Ethnic Wear': 'Dresses', // Map Ethnic Wear to Dresses
-    'Boys wear': 'T-Shirts',
-    'Girls wear': 'Dresses',
-    'Winter wear': 'Jackets'
+  // Process images - handle both single image string and array of images
+  const images = [];
+  const processImageUrl = (img) => {
+    if (!img) return null;
+    // If it's already a full URL or starts with /uploads, use as is
+    if (typeof img === 'string' && (img.startsWith('http') || img.startsWith('/uploads'))) {
+      return img;
+    }
+    // Otherwise, assume it's a filename and prepend uploads path
+    return `/uploads/products/${img}`;
   };
 
-  if (categoryMap[category]) {
-    category = categoryMap[category];
-  } else {
-    // If category not in map, log warning and use a default
-    console.warn(`Warning: Category "${category}" not mapped, using original value`);
+  // Handle single image or array of images
+  if (Array.isArray(productJson.images)) {
+    productJson.images.slice(0, 5).forEach((img, index) => {
+      const imgUrl = processImageUrl(img);
+      if (imgUrl) {
+        images.push({
+          url: imgUrl,
+          alt: `${name} - Image ${index + 1}`,
+          isPrimary: index === 0
+        });
+      }
+    });
+  } else if (productJson.image) {
+    const imgUrl = processImageUrl(productJson.image);
+    if (imgUrl) {
+      images.push({
+        url: imgUrl,
+        alt: name,
+        isPrimary: true
+      });
+    }
   }
 
+  // Add a placeholder if no images were added
+  if (images.length === 0) {
+    images.push({
+      url: '/uploads/placeholder.jpg',
+      alt: 'No image available for ' + name,
+      isPrimary: true
+    });
+  }
+
+
+  // Generate random but realistic product data
+  const rating = (Math.random() * 1.5 + 3.5).toFixed(1); // 3.5 - 5.0
+  const colors = ['Black', 'White', 'Blue', 'Red', 'Green', 'Gray', 'Navy', 'Beige'];
+  const selectedColors = [];
+  
+  // Select 1-3 random colors
+  const numColors = Math.min(3, Math.max(1, Math.floor(Math.random() * 4)));
+  while (selectedColors.length < numColors) {
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    if (!selectedColors.includes(color)) {
+      selectedColors.push(color);
+    }
+  }
+
+  // Add some products with discounts (about 30% of products)
+  const hasDiscount = Math.random() < 0.3;
+  const originalPrice = hasDiscount 
+    ? Math.ceil(price * (1.1 + Math.random() * 0.4)) // 10-50% more than price
+    : null;
+
   return {
-    name: productJson.name,
-    description: productJson.description,
-    price: productJson.price, // This is the discount_price in user's schema
-    originalPrice: productJson.discount_price, // This is the base price
-    category: category,
-    gender: genderMap[productJson.gender] || 'Unisex',
+    name: name,
+    description: description,
+    price: price,
+    originalPrice: originalPrice,
+    category: mappedCategory,
+    gender: gender,
     sizes: sizes,
-    colors: productJson.colors,
+    colors: selectedColors,
     images: images,
-    rating: productJson.rating,
-    inStock: productJson.stock > 0,
-    numReviews: Math.floor(productJson.rating * 10) // Generate review count based on rating
+    rating: parseFloat(rating),
+    inStock: Math.random() > 0.1, // 90% chance of being in stock
+    numReviews: Math.floor(Math.random() * 50),
+    brand: brand,
+    featured: Math.random() < 0.2, // 20% chance of being featured
+    createdAt: new Date(Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24 * 90)), // Random date in last 90 days
+    updatedAt: new Date()
   };
+  } catch (error) {
+    console.error('Error processing product:', {
+      name: productJson['display name'],
+      error: error.message
+    });
+    // Instead of skipping, return a minimal valid product to prevent skipping
+    return {
+      name: (productJson['display name'] || 'Unnamed Product').substring(0, 50).trim(),
+      description: (productJson.description || 'No description available').substring(0, 1000).trim(),
+      price: 99,
+      originalPrice: null,
+      category: 'Clothing',
+      gender: 'Unisex',
+      sizes: [{ size: 'M', stock: 10 }],
+      colors: ['Black'],
+      images: [{ url: '/uploads/placeholder.jpg', alt: 'No image available', isPrimary: true }],
+      rating: 4.0,
+      inStock: true,
+      numReviews: 0,
+      brand: 'Generic',
+      featured: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+  }
 }
 
 // Main seeding function
@@ -111,48 +216,73 @@ async function seedProducts() {
     const productsData = JSON.parse(fs.readFileSync(productsPath, 'utf8'));
     console.log(`Found ${productsData.length} products to process...\n`);
 
-    // Process each product
-    for (const productJson of productsData) {
-      try {
-        const productData = mapProductToSchema(productJson);
+    // Don't clear existing products, we'll update them
+    console.log('Preparing to update existing products...');
+
+    // Process products in batches to avoid memory issues
+    const batchSize = 50;
+    let processedCount = 0;
+    let createdCount = 0;
+    let updatedCount = 0;
+
+    console.log('Processing products...');
+    
+    // Process products in batches
+    for (let i = 0; i < productsData.length; i += batchSize) {
+      const batch = productsData.slice(i, i + batchSize);
+      const productPromises = [];
+      
+      for (const productJson of batch) {
+        processedCount++;
         
-        // Check if product exists by custom id field (we'll use name as unique identifier)
-        // Since Mongoose uses _id, we'll check by name or use findOneAndUpdate with upsert
-        // For idempotency, we'll use the JSON id stored in a custom field or use name
-        
-        // Try to find by name first
-        const existingProduct = await Product.findOne({ name: productData.name });
-        
-        if (existingProduct) {
-          // Update existing product
-          await Product.findByIdAndUpdate(
-            existingProduct._id,
+        try {
+          const productData = mapProductToSchema(productJson);
+          if (!productData) continue;
+          
+          // Try to find existing product by name or create new one
+          const existingProduct = await Product.findOneAndUpdate(
+            { name: productData.name },
             { $set: productData },
-            { new: true, runValidators: true }
+            { upsert: true, new: true, runValidators: true }
           );
-          updatedCount++;
-          process.stdout.write(`\rUpdated: ${updatedCount}, Inserted: ${insertedCount}`);
-        } else {
-          // Insert new product
-          await Product.create(productData);
-          insertedCount++;
-          process.stdout.write(`\rUpdated: ${updatedCount}, Inserted: ${insertedCount}`);
+          
+          if (existingProduct) {
+            updatedCount++;
+          } else {
+            createdCount++;
+          }
+          
+          // Update progress
+          if (processedCount % 10 === 0 || processedCount === productsData.length) {
+            process.stdout.write(`\rProcessed: ${processedCount}/${productsData.length} | ` +
+                              `Created: ${createdCount} | ` +
+                              `Updated: ${updatedCount}`);
+          }
+        } catch (error) {
+          console.error(`\nError processing product at index ${i}:`, error.message);
+          skippedProducts++;
         }
-      } catch (error) {
-        console.error(`\nError processing product ID ${productJson.id}: ${error.message}`);
-        // Continue with next product
       }
+      
+      // Wait for batch to complete
+      await Promise.all(productPromises);
     }
 
     console.log('\n\n✅ Product seeding completed!');
     console.log(`📊 Summary:`);
-    console.log(`   - Inserted: ${insertedCount} products`);
-    console.log(`   - Updated: ${updatedCount} products`);
-    console.log(`   - Total processed: ${insertedCount + updatedCount} products`);
+    console.log(`   - Processed: ${processedCount} products`);
+    console.log(`   - Created: ${createdCount} new products`);
+    console.log(`   - Updated: ${updatedCount} existing products`);
+    console.log(`   - Total in database: ${await Product.countDocuments()}`);
 
-    // Seed sample orders
-    console.log('\n🛒 Seeding sample orders...');
-    await seedOrders();
+    // Seed sample orders if we have enough products
+    const productCount = await Product.countDocuments();
+    if (productCount > 10) {
+      console.log('\n🛒 Seeding sample orders...');
+      await seedOrders();
+    } else {
+      console.log('\n⚠️  Not enough products to create sample orders');
+    }
 
   } catch (error) {
     console.error('\n❌ Error during seeding:', error.message);

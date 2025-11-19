@@ -50,7 +50,39 @@ const app = express();
 app.use(helmet());
 
 // Middleware
-app.use(cors());
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || process.env.FRONTEND_URL || 'http://localhost:3000').split(',');
+const corsOptions = {
+  origin: function (origin, callback) {
+    // In production, only allow requests from the frontend URL
+    // In development, allow localhost and the frontend URL
+    const allowedOrigins = process.env.NODE_ENV === 'production'
+      ? [process.env.FRONTEND_URL]
+      : [
+          'http://localhost:3000',
+          'http://localhost:5000',
+          process.env.FRONTEND_URL
+        ];
+    
+    // Allow requests with no origin (like mobile apps or curl requests) in development
+    if (!origin && process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    // Check if the origin is allowed
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Not allowed by CORS. Origin ${origin} not allowed`));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+  preflightContinue: false
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '30mb' }));
 app.use(express.urlencoded({ extended: true }));
 

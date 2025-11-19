@@ -25,7 +25,7 @@ const getProducts = async (req, res) => {
       if (req.query.maxPrice) filter.price.$lte = parseFloat(req.query.maxPrice);
     }
 
-    // Size filter
+    // Size filter  
     if (req.query.size) {
       filter['sizes.size'] = req.query.size;
     }
