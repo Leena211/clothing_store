@@ -66,3 +66,9 @@
 {"level":"info","message":{"duration":"1ms","ip":"::1","method":"GET","status":404,"url":"/[object%20Object]"},"service":"clothing-store-api","timestamp":"2025-11-17 13:00:06"}
 {"level":"info","message":{"duration":"1345ms","ip":"::1","method":"GET","status":304,"url":"/?"},"service":"clothing-store-api","timestamp":"2025-11-17 13:05:31"}
 {"level":"info","message":{"duration":"1ms","ip":"::1","method":"GET","status":404,"url":"/[object%20Object]"},"service":"clothing-store-api","timestamp":"2025-11-17 13:05:31"}
+{"level":"info","message":"Server running in development mode on port 5000","service":"clothing-store-api","timestamp":"2025-11-19 07:31:55"}
+{"level":"info","message":{"duration":"6ms","ip":"::1","method":"GET","status":304,"url":"/"},"service":"clothing-store-api","timestamp":"2025-11-19 07:32:53"}
+{"level":"info","message":{"duration":"1ms","ip":"::1","method":"GET","status":304,"url":"/swagger-ui-init.js"},"service":"clothing-store-api","timestamp":"2025-11-19 07:32:53"}
+{"level":"info","message":{"duration":"8ms","ip":"::1","method":"GET","status":304,"url":"/swagger-ui.css"},"service":"clothing-store-api","timestamp":"2025-11-19 07:32:53"}
+{"level":"info","message":{"duration":"7ms","ip":"::1","method":"GET","status":304,"url":"/swagger-ui-standalone-preset.js"},"service":"clothing-store-api","timestamp":"2025-11-19 07:32:53"}
+{"level":"info","message":{"duration":"9ms","ip":"::1","method":"GET","status":304,"url":"/swagger-ui-bundle.js"},"service":"clothing-store-api","timestamp":"2025-11-19 07:32:53"}
